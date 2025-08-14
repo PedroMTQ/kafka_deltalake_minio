@@ -1,0 +1,30 @@
+[project]
+name = "kafka_deltalake_minio"
+version = "0.0.1"
+authors = [{ name = "Pedro Queiros", email = "coding.paradox013@passmail.net" }]
+requires-python = "~=3.12"
+readme = "README.md"
+maintainers = [{ name = "Pedro Queiros", email = "coding.paradox013@passmail.net" }]
+dependencies = [
+    "deltalake",
+    "boto3",
+    "s3fs",
+    "polars",
+    "kafka-python",
+]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[tool.ruff]
+line-length = 110
+lint.select = ["E",  "W",  "F",  "I", "B"]
+lint.ignore=["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["E402"]
+
+

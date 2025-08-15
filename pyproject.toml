@@ -9,8 +9,14 @@ dependencies = [
     "deltalake",
     "boto3",
     "s3fs",
+    "uuid6",
     "polars",
+    "pyarrow",
+    "retry",
+    "pymongo",
     "kafka-python",
+    "faker",
+    "ruff",
 ]
 
 

@@ -77,6 +77,10 @@ class ClientMongo():
     def get_collections(self):
         return self.database.list_collection_names()
 
+    def replace_collection(self, old_collection_name: str, new_collection_name: str):
+        self.database.drop_collection(old_collection_name)
+        self.database.get_collection(new_collection_name).rename(old_collection_name)
+
     def get_indexes(self, collection_name: str):
         collection = self.database.get_collection(collection_name)
         res = set()
@@ -96,11 +100,23 @@ class ClientMongo():
         for idx in collection_indexes:
             collection.create_index(name=idx, keys=idx)
 
-    # @retry(Exception, tries=MONGO_RETRIES, delay=MONGO_RETRY_DELAY, backoff=MONGO_RETRY_BACKOFF, logger=logger)
+    @retry(Exception, tries=MONGO_RETRIES, delay=MONGO_RETRY_DELAY, backoff=MONGO_RETRY_BACKOFF, logger=logger)
+    def batch_insert(self,
+                     batch: list[dict],
+                     collection_name: str):
+        if not batch:
+            return
+        collection = self.database.get_collection(collection_name)
+        logger.debug('Processing data batch')
+        start = perf_counter()
+        collection.insert_many(batch)
+        end = perf_counter()
+        logger.debug(f'Data insertion of {len(batch)} rows took {end-start} seconds')
+
+    @retry(Exception, tries=MONGO_RETRIES, delay=MONGO_RETRY_DELAY, backoff=MONGO_RETRY_BACKOFF, logger=logger)
     def batch_upsert(self,
                      batch: list[dict],
                      collection_name: str,
-                     collection_indexes: list,
                      upsert_keys: list[str],
                      headers: list[str]) -> int:
         processed_batch = []
@@ -108,8 +124,6 @@ class ClientMongo():
         if not batch:
             return 0
         collection = self.database.get_collection(collection_name)
-        self.create_indexes(collection_name=collection_name,
-                            collection_indexes=collection_indexes)
         logger.debug('Processing data batch')
         start = perf_counter()
         for row in batch:

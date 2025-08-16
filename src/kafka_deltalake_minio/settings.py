@@ -1,6 +1,11 @@
 import os
+from typing import Literal
 
-SERVICE_NAME = 'kafka_deltalake_minio'
+SERVICE_NAME = os.getenv('SERVICE_NAME', 'kafka_deltalake_minio')
+try:
+    __VERSION__ = open('/app/__version__').readline().strip()
+except Exception as _:
+    __VERSION__ = None
 ROOT = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 DATA = os.path.join(ROOT, 'data')
 
@@ -41,3 +46,8 @@ PARTITION_KEY = os.getenv('PARTITION_KEY')
 UPSERT_KEY = os.getenv('UPSERT_KEY')
 
 MONGO_SYNC_SLEEP_TIME = int(os.getenv('MONGO_SYNC_SLEEP_TIME'))
+# upsert updates entries with sync or rollback, but if an entry is deleted from the delta table then it will be kept
+# insert creates a temp collection and then replaces the original collection. Keep in mind that in a prod environment you'd need to ensure downstream services can handle mongo disconnections
+MONGO_WRITE_MODES = Literal['upsert', 'insert']
+
+MONGO_WRITE_MODE: MONGO_WRITE_MODES = os.getenv('MONGO_WRITE_MODE', 'insert')

@@ -21,7 +21,6 @@ class KafkaToDeltaConsumer(BaseConsumer):
         super().__init__(topics=[KAFKA_TOPIC],
                          consumer_timeout_ms=CONSUMER_TIMEOUT_MS,
                          group_id=self.group_id)
-        logger.info(self)
 
     def run(self):
         batch = []

@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from typing import Optional
+from kafka_deltalake_minio.io.logger import logger
 
 from kafka import KafkaConsumer
 
@@ -22,9 +23,10 @@ class BaseConsumer(KafkaConsumer):
                                       consumer_timeout_ms=consumer_timeout_ms,
                                   )
         self.consumer.subscribe(self.topics)
+        logger.info(self)
 
     def __str__(self):
-        return f'{self.__class__.__name__} from group <{self.group_id}> is consuming from {self.topics}'
+        return f'{self.__class__.__name__} from group <{self.group_id}> is consuming from {self.topics} at {KAFKA_BROKER}'
 
     @abstractmethod
     def run(self):

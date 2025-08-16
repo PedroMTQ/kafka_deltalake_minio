@@ -3,10 +3,10 @@
 This is a simple project to test Deltalake with Kafka, MinIO and MongoDb.
 
 
-## Deployment
+## Infrastructure Deployment
 
 ```bash
-docker compose up
+docker compose -f docker-compose-infra.yaml up
 ```
 This will deploy Minio (with auto-creation of buckets - see MINIO_BUCKETS in the docker compose) and Kafka
 
@@ -48,3 +48,12 @@ You can rollback to a specific version or timestamp with:
 
 You can rollback to a specific version or timestamp (as of) - since we are adding data in batches timestamps are more relevant since every batch will increment the _commit_version
 
+## Workflow deployment
+
+```bash
+# build image first (we use one template for all services)
+docker compose build
+# deploy it then
+docker compose up
+```
+This will multiple consumer replicas, and one mongo syncer

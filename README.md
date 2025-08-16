@@ -56,4 +56,4 @@ docker compose build
 # deploy it then
 docker compose up
 ```
-This will multiple consumer replicas, and one mongo syncer
+This will spawm multiple consumer replicas, and one mongo syncer

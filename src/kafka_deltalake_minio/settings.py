@@ -50,4 +50,6 @@ MONGO_SYNC_SLEEP_TIME = int(os.getenv('MONGO_SYNC_SLEEP_TIME'))
 # insert creates a temp collection and then replaces the original collection. Keep in mind that in a prod environment you'd need to ensure downstream services can handle mongo disconnections
 MONGO_WRITE_MODES = Literal['upsert', 'insert']
 
-MONGO_WRITE_MODE: MONGO_WRITE_MODES = os.getenv('MONGO_WRITE_MODE', 'insert')
+MONGO_WRITE_MODE: MONGO_WRITE_MODES = os.getenv('MONGO_WRITE_MODE', 'upsert')
+
+EXPIRATION_DAYS_MONGO = int(os.getenv('EXPIRATION_DAYS_MONGO', 30))

@@ -1,5 +1,5 @@
 from datetime import datetime
-
+from datetime import timedelta
 import polars
 from deltalake import DeltaTable
 from typing import Iterable
@@ -16,6 +16,7 @@ from kafka_deltalake_minio.settings import (
     UPSERT_KEY,
     MONGO_WRITE_MODE,
     MONGO_WRITE_MODES,
+    EXPIRATION_DAYS_MONGO,
 )
 
 
@@ -34,6 +35,8 @@ class MongoSyncer():
                                            collection_name=CUSTOMERS_COLLECTION_NAME,
                                            upsert_keys=[UPSERT_KEY],
                                            headers=CustomerData.fields())
+        self.mongo_client.delete_stale(collection_name=CUSTOMERS_COLLECTION_NAME,
+                                       timedelta=timedelta(days=EXPIRATION_DAYS_MONGO))
 
     def __run_insert(self, data_yielder: Iterable):
         temp_collection = f'temp_{CUSTOMERS_COLLECTION_NAME}'

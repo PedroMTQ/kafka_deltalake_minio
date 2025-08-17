@@ -9,6 +9,7 @@ import pymongo
 import pymongo.errors
 from pymongo.errors import ServerSelectionTimeoutError
 from retry import retry
+from datetime import timedelta, datetime, timezone
 
 from kafka_deltalake_minio.core.utils import get_current_time
 from kafka_deltalake_minio.io.logger import logger
@@ -178,6 +179,14 @@ class ClientMongo():
                 },
             ]
         return pymongo.UpdateOne(filter=query, update=update_pipeline, upsert=True)
+
+
+    @retry(Exception, tries=MONGO_RETRIES, delay=MONGO_RETRY_DELAY, backoff=MONGO_RETRY_BACKOFF, logger=logger)
+    def delete_stale(self, collection_name: str, timedelta: timedelta):
+        collection = self.database.get_collection(collection_name)
+        cutoff_date = datetime.now(tz=timezone.utc) - timedelta
+        result = collection.delete_many({"updated_at": {"$lt": cutoff_date}})
+        logger.info(f"Deleted {result.deleted_count} stale documents.")
 
 
 if __name__ == '__main__':
